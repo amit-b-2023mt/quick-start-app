@@ -1,29 +1,53 @@
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 
 class TaskService {
-  Future<List<ParseObject>> getTasks() async {
-    final query = QueryBuilder<ParseObject>(ParseObject('Task'));
-    final response = await query.query();
-    if (response.success) {
-      return response.results as List<ParseObject>;
-    }
-    return [];
-  }
-
+  /// Add a task for the current user
   Future<void> addTask(String title, DateTime dueDate) async {
-    final task = ParseObject('Task')
+    // Get the current logged-in user
+    final ParseUser? currentUser = await ParseUser.currentUser() as ParseUser?;
+
+    if (currentUser == null) {
+      throw Exception('No user logged in');
+    }
+
+    // Create the task object
+    final ParseObject task = ParseObject('Task')
       ..set('title', title)
       ..set('dueDate', dueDate)
-      ..set('isCompleted', false);
-    await task.save();
+      ..set('isCompleted', false)
+      ..set('createdBy', currentUser); // Associate with the user
+
+    // Save the task
+    final ParseResponse response = await task.save();
+
+    if (!response.success) {
+      throw Exception(response.error!.message);
+    }
   }
 
-  Future<void> toggleTaskStatus(ParseObject task, bool isCompleted) async {
-    task.set('isCompleted', isCompleted);
-    await task.save();
-  }
+  /// Fetch tasks for the current user
+  Future<List<ParseObject>> getTasks() async {
+    // Get the current logged-in user
+    final ParseUser? currentUser = await ParseUser.currentUser() as ParseUser?;
 
-  Future<void> deleteTask(ParseObject task) async {
-    await task.delete();
+    if (currentUser == null) {
+      throw Exception('No user logged in');
+    }
+
+    // Query tasks where 'createdBy' matches the current user
+    final QueryBuilder<ParseObject> queryTasks =
+        QueryBuilder<ParseObject>(ParseObject('Task'))
+          ..whereEqualTo('createdBy', currentUser)
+          ..orderByDescending('dueDate'); // Sort by due date (optional)
+
+    // Execute the query
+    final ParseResponse response = await queryTasks.query();
+
+    if (response.success && response.results != null) {
+      return response.results as List<ParseObject>;
+    } else {
+      return [];
+    }
   }
+  
 }

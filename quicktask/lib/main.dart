@@ -6,8 +6,8 @@ import 'package:quicktask/task_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  const String appId = 'Your_Back4App_Application_ID';
-  const String clientKey = 'Your_Back4App_Client_Key';
+  const String appId = '5FjaQs6VadKMVNhDfgwt8TTgz2cqQBHayRhK2dKW';
+  const String clientKey = '9Xoc3BdTr3Vsz3H0Yi26UDcRsAgznhgeR5iL4s2d';
   const String serverUrl = 'https://parseapi.back4app.com/';
 
   await Parse().initialize(appId, serverUrl, clientKey: clientKey, autoSendSessionId: true);
