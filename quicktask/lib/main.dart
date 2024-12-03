@@ -23,6 +23,7 @@ class QuickTaskApp extends StatelessWidget {
     return MaterialApp(
       title: 'QuickTask',
       theme: ThemeData(primarySwatch: Colors.blue),
+      debugShowCheckedModeBanner: false,
       home: const LoginPage(),
       routes: {
   '/tasks': (context) => const TaskPage(),
